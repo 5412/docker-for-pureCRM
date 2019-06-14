@@ -1,0 +1,46 @@
+version: '3'
+services:
+    nginx:
+        container_name: pure-crm-nginx
+        image: nginx 
+        environment:
+            - TZ=CST-8
+        ports:
+            - "8090:80"
+        links:
+            - php-fpm
+        volumes:
+            - /apps/done-tech/pure-crm:/var/www/html/laravel
+            - ./nginx/sites:/etc/nginx/sites-enabled
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+
+    php-fpm:
+        container_name: pure-crm-php-fpm
+        image: 'bitnami/php-fpm:7.1'
+        environment:
+            - TZ=CST-8
+        volumes:
+            - /apps/done-tech/pure-crm:/var/www/html/laravel
+            - ./php-fpm/php.ini:/bitnami/php/conf/php.ini
+        links:
+            - mysql
+            - redis
+
+    mysql:
+        container_name: pure-crm-mysql
+        image: mysql
+        restart: always
+        ports:
+            - "3306:3306"
+        environment:
+            - TZ=CST-8
+            - MYSQL_ROOT_PASSWORD=example
+        volumes:
+            - ./mysql:/var/lib/mysql
+
+    redis:
+        container_name: pure-crm-redis
+        environment:
+            - TZ=CST-8
+        image: redis
+
